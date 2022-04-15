@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  app:
+    image: 'userserviceapp:latest'
+    build:
+      context: ./UserService
+    container_name: userserviceapp
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/test
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=root
+  client:
+    image: 'adminserviceapp:latest'
+    build:
+      context: ./AdminService
+    container_name: adminserviceapp
+    ports:
+      - "8081:8081"
+    environment:
+      - USER_SERVICE_AUTH_URL=http://userserviceapp:8080/auth/login
+      - USER_SERVICE_GET_URL=http://userserviceapp:8080/api/user
+
+
+  db:
+    image: postgres:13
+    container_name: db
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    
